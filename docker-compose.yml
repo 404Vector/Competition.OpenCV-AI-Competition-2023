@@ -1,0 +1,20 @@
+version: '3'
+services:
+  application:
+    build: 
+      context: .
+      dockerfile: docker/dockerfile
+    container_name: opecv-ai-competition-dev
+    ports:
+      - "8080:8080"
+    ipc: host
+    tty: true
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+    volumes:
+      - .:/workspace/Competition.OpenCV-AI-Competition-2023

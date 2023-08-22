@@ -1,0 +1,9 @@
+FROM nvcr.io/nvidia/tensorrt:23.07-py3
+
+# install apt
+RUN apt-get update && apt install -y --no-install-recommends \
+    git \
+    htop \
+    iotop \
+    && rm -rf /var/lib/apt/lists/* \
+    && pip install pipenv
