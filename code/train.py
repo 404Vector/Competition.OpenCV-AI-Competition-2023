@@ -17,7 +17,36 @@ from converter import InputConverter, LabelConverter
 
 def parse_arges() -> Namespace:
     paser = ArgumentParser()
-
+    paser.add_argument(
+        "--split_ratio",
+        default=0.8,
+        type=float,
+        help="The ratio value to split the training dataset and validation dataset.",
+    )
+    paser.add_argument(
+        "--epoch",
+        default=50,
+        type=int,
+        help="This is the total number of times to train the model.",
+    )
+    paser.add_argument(
+        "--lr",
+        default=1e-4,
+        type=float,
+        help="This is the learning rate at which the model will be trained.",
+    )
+    paser.add_argument(
+        "--batch_size",
+        default=16,
+        type=int,
+        help="This is the number of data to train at once.",
+    )
+    paser.add_argument(
+        "--random_seed",
+        default=42,
+        type=int,
+        help="This is the random seed value. We fix the random seed to this value at the beginning of the process.",
+    )
     return paser.parse_args(())
 
 
@@ -55,11 +84,11 @@ def main(args: Namespace):
 
     # set param
     device = "cuda"
-    split_ratio = 0.8
-    epoch = 50
-    lr = 1e-4
-    batch_size = 16
-    random_seed = 42
+    split_ratio = args.split_ratio
+    epoch = args.epoch
+    lr = args.lr
+    batch_size = args.batch_size
+    random_seed = args.random_seed
 
     # set random seed
     set_random_seed(random_seed)
