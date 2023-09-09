@@ -13,6 +13,7 @@ from torch import nn, optim
 from torch.utils.data import DataLoader
 from model import ColorRegressor
 from converter import InputConverter, LabelConverter
+from stopper import Stopper
 
 
 def parse_arges() -> Namespace:
@@ -46,6 +47,12 @@ def parse_arges() -> Namespace:
         default=42,
         type=int,
         help="This is the random seed value. We fix the random seed to this value at the beginning of the process.",
+    )
+    paser.add_argument(
+        "--patience",
+        default=4,
+        type=int,
+        help="If the validation loss does not decrease by this value every epoch, training ends.",
     )
     return paser.parse_args(())
 
@@ -89,6 +96,7 @@ def main(args: Namespace):
     lr = args.lr
     batch_size = args.batch_size
     random_seed = args.random_seed
+    patience = args.patience
 
     # set random seed
     set_random_seed(random_seed)
@@ -100,6 +108,7 @@ def main(args: Namespace):
     model = ColorRegressor().to(device)
     criterion = nn.MSELoss().to(device)
     optimizer = optim.Adam(model.parameters(), lr=lr)
+    stopper = Stopper(patience=patience)
 
     train_dataset, validation_dataset = split_dataset_by_ratio(
         dataset=dataset, split_ratio=split_ratio
@@ -140,8 +149,13 @@ def main(args: Namespace):
             epoch_index=epoch_index,
         )
         process_bar.set_description(
-            f"epoch {epoch_index:#04d}| train_cost {train_cost:#.6f}| valid_cost {valid_cost:#.6f}|"
+            f"epoch {epoch_index:#04d}|train_cost {train_cost:#.6f}|valid_cost {valid_cost:#.6f}|"
         )
+        if stopper(validation_loss=valid_cost):
+            print(
+                "The stopper terminated training because the validation loss did not decrease."
+            )
+            break
 
 
 if __name__ == "__main__":
