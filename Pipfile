@@ -12,6 +12,7 @@ numpy = "*"
 tqdm = "*"
 pandas = "*"
 streamlit = "*"
+timm = "*"
 
 [dev-packages]
 
